@@ -1,0 +1,18 @@
+# cache files
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# virtual environments
+env/
+venv/
+.env
+
+# Databases and media
+*.sqlite3
+media/
+staticfiles/
+
+# IDEs
+.vscode/
+.idea/

@@ -1,0 +1,296 @@
+:root {
+  --bg-page: #ffffff;
+  --text-main: #212529;
+  --panel-bg: #ffffff;
+  --panel-text: #212529;
+  --hover-bg: #f8f9fa;
+  --error-txt: #c30010;
+  --analysis-bg: #f0f8ff;
+  --analysis2-bg: #cae9f5;
+  --analysis3-bg: #afdceb;
+}
+
+body.dark-mode {
+  --bg-page: #121212;
+  --text-main: #e0e0e0;
+  --panel-bg: #2c2c2c;
+  --panel-text: #e0e0e0;
+  --hover-bg: #3a3a3a;
+  --error-txt: #f94449;
+  --analysis-bg: #073259;
+  --analysis2-bg: #062a4a;
+  --analysis3-bg: #04123b;
+}
+
+body {
+  zoom: 0.8;
+  background-color: var(--bg-page);
+  color: var(--text-page);
+}
+
+body.dark-mode {
+  --hover-bg: #3a3a3a;
+}
+
+.home {
+  background-color: var(--bg-page);
+  color: var(--text-main);
+}
+
+.tx-item:hover {
+  background-color: var(--hover-bg) !important;
+}
+
+.dashboard-header {
+  background-color: var(--panel-bg) !important;
+  color: var(--panel-text) !important;
+}
+
+.home,
+.dashboard-header,
+.panel-heading
+.panel 
+body{
+  transition: background-color .3s ease, color .3s ease !important;
+}
+
+.panel .panel-heading {
+  background-color: var(--panel-bg);
+  color: var(--panel-text);
+}
+
+body.dark-mode .bg-white {
+  background-color: var(--panel-bg) !important;
+}
+
+body.dark-mode .text-dark .tx-item{
+  color: var(--panel-text) !important;
+}
+
+body.dark-mode .panel .content{
+  background-color: var(--panel-bg);
+  color: var(--panel-text);
+}
+
+body.dark-mode .btn {
+  background-color: var(--panel-bg);
+  color: var(--panel-text);
+  border-color: rgba(233,236,239,.5);
+}
+
+.padding100{
+  padding-top: 100px;
+}
+
+.padding50 {
+  padding-top: 50px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.toggle-btn {
+  background-color: hsl(348, 5%, 82%);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 18px;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.toggle-btn:hover {
+  background-color: #7e7e7e;
+}
+
+.transaction-list {
+  list-style: none;
+  padding: 0;
+}
+
+.transaction-panel {
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,0.15);
+}
+
+.tx-item {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  font-size: 14px;
+}
+
+
+.form-panel {
+  width: 50%;
+  padding: 20px;
+  background-color: #ffffff;
+}
+
+.Income-text {
+  color: #43803a
+}
+
+.Expense-text {
+  color: #ce2222
+}
+
+.sub-btn {
+  margin-bottom: 10px
+}
+
+#graphic-img {
+  transition: opacity 0.3s ease-in-out;
+  display: flex;
+  justify-content: center;
+}
+
+#graphic-img img {
+  max-width: 100%;
+  height: auto;
+}
+
+.dashboard {
+  display: flex;
+  justify-content: space-between; 
+  align-items: flex-start;
+  gap: 1rem;
+  height: 110vh;     
+  color:var(--panel-text);                
+}
+
+.panel {
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.panel.left,
+.panel.right {
+  flex: 0 0 20%; 
+  overflow-y: auto; 
+}
+
+.panel.left {
+  height:97%;
+}
+
+.panel.center {
+  flex: 0 0 50%; 
+}
+
+#balanceChart {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+}
+
+.filters {
+  max-height: 20%;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.panel-list {
+  height: 75%;           
+  overflow-y: auto;
+}
+
+.panel-data {
+  text-align: center;      
+}
+
+.tx-transaction{
+  color: var(--panel-text);
+}
+
+.balance-label {
+  padding-top:5%;
+  font-size: 0.9rem;       
+  margin: 0;  
+  color: var(--panel-text);                     
+}
+
+.balance-amount {
+  font-size: 1.5rem;     
+  margin: 0;             
+  font-weight: 600;      
+}
+
+.panel-heading {
+  z-index: 10;
+  text-align: center;
+  padding-bottom: 2%;
+}
+
+.analysis {
+  margin-top:2%;
+  background-color: var(--analysis-bg);
+  height:115vh;
+}
+
+.analysis2 {
+  height:115vh;
+  background-color:var(--analysis2-bg);
+}
+
+.analysis3 {
+  height:115vh;
+  background-color:var(--analysis3-bg);
+}
+
+.average-expenses {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;          
+  max-width: 900px;   
+  margin: 0 auto;     
+  padding: 1rem;
+}
+
+.period-select{
+  display: flex;
+  flex-direction: column;
+}
+
+.period-select label {
+  margin-bottom: .5rem;
+  font-weight: bold;
+}
+    
+.period-select select {
+  padding: .5rem;
+  font-size: 1rem;
+}
+
+.chart-box {
+  flex: 1;
+}
+
+.chart-box img {
+  width: 100%;
+  height: 400px;         
+  object-fit: contain;   
+}
+
+.Checkboxes-controls {
+  display: contain;
+  gap: 1rem;
+  margin-bottom: 1rem; }
+
+.table-spending-days {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-top: 1rem;
+  overflow-y: auto;
+}
+
+.home-error {
+  margin-top:10%;
+  color: var(--error-txt);
+}

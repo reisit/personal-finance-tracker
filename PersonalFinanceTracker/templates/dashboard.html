@@ -1,0 +1,295 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <title>Dashboard</title>
+</head>
+<body>
+
+<header class="dashboard-header shadow-sm bg-white sticky-top">
+  <div class="container-fluid d-flex align-items-center justify-content-between py-2">
+    
+    <div class="d-flex align-items-center">
+      <a href="{% url 'home' %}" class="text-decoration-none text-dark me-2">
+        <i class="bi bi-house-fill fs-4"></i>
+      </a>
+      <span class="fw-medium text-nowrap ms-3">Welcome: {{ user.name }} {{user.lastName}}</span>
+    </div>
+    
+    <h2 class="m-0 position-absolute start-50 translate-middle-x">
+      Personal Dashboard
+    </h2>
+    
+    <button id="theme-toggle" 
+            class="btn btn-outline-secondary p-1" 
+            aria-label="Toggle theme">
+      <i class="bi bi-moon-fill fs-4"></i>
+    </button>
+  </div>
+</header> 
+
+<div class="dashboard">
+
+    <div class="panel left transaction-panel shadow bg-white rounded">
+      <div class="panel-heading sticky-top bg-white">
+        <h4 class="mb-0">Transactions</h4>
+      </div>
+      <div class="panel-list">
+        <ul class="transaction-list">
+          {% for tx in transactions %}
+            <li class="tx-item d-flex justify-content-between align-items-center"
+              onclick="loadTransaction(this)"
+              data-id="{{ tx.Id }}"
+              data-description="{{ tx.description }}"
+              data-category="{{ tx.category }}"
+              data-amount="{{ tx.amount }}"
+              data-date="{{ tx.date|date:'Y-m-d' }}">>
+              <div class="tx-content">
+                <div class="fw-bold">
+                  <strong class="
+                  {% if tx.category == 'I' %}
+                    Income-text
+                  {% elif tx.category == 'E' %}
+                    Expense-text
+                  {% endif %}">
+                  [{{ tx.Id }}]  {{ tx.description }}</strong> 
+                </div>
+              <div class="tx-transaction">
+                {% if tx.category == 'I' %}
+                  Income
+                {% elif tx.category == 'E' %}
+                  Expense
+                {% else %}
+                  {{ tx.category }}
+                {% endif %} | {{ tx.amount }} $ | {{ tx.date }} 
+              </div>
+          </div>
+            <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); loadDelete(this)" data-id="{{ tx.Id }}">X</button>
+            </li>
+          {% empty %}
+            <li>No transactions.</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="panel-data">
+        <p class="balance-label fs-5 fw-bold">Balance</p>
+        <p
+          class="balance-amount fs-2
+            {% if accumulatedBalance >= 0 %}
+              text-success
+            {% else %}
+              text-danger
+            {% endif %}">
+          {{ accumulatedBalance }} $
+        </p>
+      </div>
+    </div>
+
+    <div class="panel center">
+
+      <div class="filters d-flex justify-content-center flex-wrap gap-2 mb-3">
+        <button class="btn btn-outline-primary btn-sm" onclick="switchGraphic('balance')">Balance</button>
+        <button class="btn btn-outline-primary btn-sm" onclick="switchGraphic('nextMonths')">Next Months</button>
+        <button class="btn btn-outline-primary btn-sm" onclick="switchGraphic('monthlyTrends')">Monthly Trends</button>
+        <button class="btn btn-outline-primary btn-sm" onclick="switchGraphic('categories')">Categories</button>
+      </div>
+
+      <div
+        id="spinner"
+        class="spinner-border text-primary"
+        role="status"
+        style="display: none;">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+
+      <div id="graphic-img" class="text-center">
+        <img
+          id="graphic-image"
+          class="img-fluid"
+          data-seed="{{ user.seed }}"
+          src=""
+          alt="Gráfico dinámico"
+          style="display: none;"
+        >
+      </div>
+    </div>
+
+    <div class="panel right">
+      <div class="d-flex justify-content-end">
+        <div class="card" style="width: 20rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);">
+          <div class="panel-heading card-header d-flex justify-content-between align-items-center">
+            <h5 id="form-title">Insert Transaction</h5>
+            <button class="toggle-btn" onclick="toggleCard()" style="margin-bottom: 5px;">−</button>
+          </div>
+          <div class="content card-body" id="cardContent">
+            <div id="insert-form">
+              <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="insert">
+                {{ insert_form.as_p }}
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary sub-btn" style="margin-bottom: 10px">Insert</button>
+                </div>
+              </form>
+            </div>
+          
+            <div id="update-form" style="display:none;">
+              <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update">
+                <label for="update-id">Id:</label>
+                <input type="text" name="Id" id="update-id" class="form-control mb-2">
+                <label for="update-description">Description:</label>
+                <input type="text" name="description" id="update-description" class="form-control mb-2">
+                <label for="update-category">Category:</label>
+                <select name="category" id="update-category" class="form-control mb-2">
+                  <option value="I">Income</option>
+                  <option value="E">Expense</option>
+                </select>
+                <label for="update-amount">Amount:</label>
+                <input type="number" name="amount" id="update-amount" class="form-control mb-2">
+                <label for="update-date">Date:</label>
+                <input type="date" name="date" id="update-date" class="form-control mb-2">
+                <div class="text-center">
+                  <button type="submit" class="btn btn-warning" style="margin-bottom: 10px">Update</button>
+                </div>
+              </form>
+            </div>
+          
+            <div id="delete-form" style="display:none;">
+              <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete">
+                <label for="update-id">Id:</label>
+                <input type="number" name="Id" id="delete-id" class="form-control mb-2">
+                <div class="text-center">
+                  <button type="submit" class="btn btn-danger" style="margin-bottom: 10px">Delete</button>
+                </div>
+              </form>
+            </div>
+          
+            <div class="text-center" style="background-color: rgb(255 255 255 / 3%); padding-top:20px">
+              <button class="btn btn-outline-primary" style="margin-right: 5px;" onclick="switchForm('insert')">Insert</button>
+              <button class="btn btn-outline-warning" style="margin-right: 5px;margin-left: 5px;" onclick="switchForm('update')">Update</button>
+              <button class="btn btn-outline-danger" style="margin-left: 5px;"onclick="switchForm('delete')">Delete</button>
+            </div>
+          
+          </div>
+        </div>
+      </div>
+    </div>
+
+</div>
+
+<div class="dashboard analysis">
+
+  <div class="average-expenses">
+    <h2 style="margin-top: 2%">Monthly Summary</h2>
+
+    <div class="chart-box">
+      <img
+        id="monthlySummaryImg"
+        data-seed="{{ seed }}"
+        src="{% url 'monthly_summary_image' seed %}"
+        alt=""
+        style="width:100%; height:auto;">
+    </div>
+  </div>
+      
+  <div class="average-expenses">
+    <h2 style="margin-top: 30%">Top Spending Days</h2>
+
+    <div class="table-spending-days">
+      {{ topSpendingDays|safe }}
+    </div>
+
+  </div>
+</div>
+
+<div class="dashboard analysis2">
+
+  <div class="average-expenses" style="margin-top: 5%;">
+    <h2>Average Expenses</h2>
+
+    <div class="period-select">
+      <select id="periodSelect" class="form-select">
+        <option value="0">Diary</option>
+        <option value="1">Weekly</option>
+        <option value="2">Monthly</option>
+        <option value="3">Yearly</option>
+      </select>
+    </div>
+
+    <div class="chart-box">
+      <img 
+        id="avgChartImg" 
+        data-seed="{{ seed }}"
+        src="{% url 'avg_expense_image' 0 seed %}" 
+        alt="Average Expense" 
+        style="width:100%; height:auto;">
+    </div>
+  </div>
+
+  <div class="average-expenses">
+    
+  <h2 style="margin-top:2%;">Most frequent descriptions</h2>
+    <div class="Checkboxes-controls">
+      <label>
+        <input type="checkbox" id="incomeCheckbox">
+        Income
+      </label>
+      <label>
+        <input type="checkbox" id="expenseCheckbox">
+        Expense
+      </label>
+    </div>
+    <div class="chart-box">
+      <img
+        id="freqChartImg"
+        data-seed="{{ seed }}"
+        src="{% url 'freq_categories_image' seed %}?income=0&expense=0"
+        alt=""
+        style="width:100%; height:auto;">
+    </div>
+  </div>
+
+</div>
+
+<div class="dashboard analysis3">
+  <div class="average-expenses">
+      <h2 style="margin-top:20%;">Category Predictor</h2>
+      <p>This predictor uses a linear regression model to classify a transaction as income or expense based on its description. It matches the input text against a pre-labeled DataFrame and, when a description appears in both classes (e.g. bank transfers), assigns the most frequent category. It returns the label with the strongest historical support from past data.</p>
+      <form id="category-predict-form" data-seed="{{ seed }}">
+        {% csrf_token %}
+        <input type="hidden" id="seed" name="seed" value="{{ seed }}">
+        <input type="text" name="desc" id="desc" placeholder="Description">
+        <button type="submit">Predict</button>
+      </form>
+  <div id="category-predict-result"></div>
+  </div>
+
+  <div class="average-expenses">
+    <h2 style="margin-top:18%;">Amount Predictor</h2>
+    <p>This predictor leverages a RandomForestRegressor combining temporal features (daily, weekly, monthly, and annual sums), 7-day rolling windows, and a weekend flag. It uses these inputs to estimate the expected expense for the given date. Its accuracy relies on the historical dataset: realistic entries yield plausible forecasts, while sparse records or extreme outliers may distort predictions.</p>
+      <form id="amount-predict-form" data-seed="{{ seed }}">
+        {% csrf_token %}
+        <input type="hidden" id="seed" name="seed" value="{{ seed }}">
+        <input type="date" name="date" id="predict-date" placeholder="Date">
+        <button type="submit">Predict</button>
+      </form>
+  <div id="amount-predict-result"></div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'script.js' %}" defer></script>
+
+</body>
+</html>

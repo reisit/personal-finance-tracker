@@ -10,10 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import json
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -69,6 +71,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'PersonalFinanceTracker.wsgi.application'
 
+config_path = BASE_DIR / 'App' / 'functions' / 'config.json'
+
+with open(config_path, 'r', encoding='utf-8') as f:
+    config = json.load(f)
+
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -76,11 +83,11 @@ WSGI_APPLICATION = 'PersonalFinanceTracker.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'personalFinanceTracker',
-        'USER': 'root',
-        'PASSWORD': 'overpowered',
-        'HOST': 'localhost',  
-        'PORT': '3306',
+        'NAME': config['database'],
+        'USER': config['user'],
+        'PASSWORD': config['password'],
+        'HOST': config['host'],
+        'PORT': config['port'],
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },
